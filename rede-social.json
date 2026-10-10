@@ -1,0 +1,177 @@
+{
+    "users": [
+        {
+            "id": "Dillan",
+            "name": "Dillan"
+        },
+        {
+            "id": "Victor",
+            "name": "Victor"
+        },
+        {
+            "id": "Hugo",
+            "name": "Hugo"
+        },
+        {
+            "id": "Samuel",
+            "name": "Samuel"
+        },
+        {
+            "id": "Rick",
+            "name": "Rick"
+        },
+        {
+            "id": "Jonh",
+            "name": "Jonh"
+        },
+        {
+            "id": "Lara",
+            "name": "Lara"
+        },
+        {
+            "id": "Livia",
+            "name": "Livia"
+        },
+        {
+            "id": "Joao Gabriel",
+            "name": "Joao Gabriel"
+        },
+        {
+            "id": "Felipe Barroso",
+            "name": "Felipe Barroso"
+        },
+        {
+            "id": "Felipe Carvalho",
+            "name": "Felipe Carvalho"
+        },
+        {
+            "id": "Lopes",
+            "name": "Lopes"
+        },
+        {
+            "id": "Leonardo",
+            "name": "Leonardo"
+        },
+        {
+            "id": "Pedro Augusto",
+            "name": "Pedro Augusto"
+        },
+        {
+            "id": "Luana",
+            "name": "Luana"
+        },
+        {
+            "id": "Rayssa",
+            "name": "Rayssa"
+        }
+    ],
+    "friendships": [
+        [
+            "Dillan", 
+            "Victor"
+        ],
+
+        [
+            "Victor", 
+            "Samuel"
+        ],
+
+        [
+            "Dillan", 
+            "Hugo"
+        ],
+
+        [
+            "Hugo",
+            "Rick"
+        ],
+
+        [
+            "Samuel", 
+            "Rick"
+        ],
+
+        [
+            "Rick", 
+            "Jonh"
+        ],
+
+        [
+            "Jonh",
+            "Lara"
+        ],
+
+        [
+            "Lara",
+            "Livia"
+        ],
+
+        [
+            "Livia",
+            "Joao Gabriel"
+        ],
+
+        [
+            "Joao Gabriel",
+            "Felipe Barroso"
+        ],
+
+        [
+            "Felipe Barroso",
+            "Felipe Carvalho"
+        ],
+
+        [
+            "Felipe Carvalho",
+            "Lopes"
+        ],
+
+        [
+            "Lopes",
+            "Leonardo"
+        ],
+
+        [
+            "Leonardo",
+            "Pedro Augusto"
+        ],
+
+        [
+            "Pedro Augusto",
+            "Luana"
+        ],
+
+        [
+            "Luana",
+            "Rayssa"
+        ],
+
+        [
+            "Rayssa",
+            "Dillan"
+        
+        ],
+
+        [
+            "Samuel",
+            "Lara"
+        ],
+
+        [
+            "Hugo",
+            "Luana"
+        
+        ],
+
+        [
+            "Victor",
+            "Rayssa"
+        
+        ],
+
+        [
+            "Leonardo",
+            "Dillan"
+        ]
+    ]
+}
