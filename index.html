@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizador de Rede Social - BFS</title>
+    <!-- Biblioteca gráfica Vis.js Network -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f9; }
+        .container { display: flex; gap: 20px; }
+        #network-container { width: 70%; height: 600px; background: #fff; border: 1px solid #ccc; border-radius: 8px; }
+        .sidebar { width: 30%; background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select, button { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+        button { background: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .result-box { margin-top: 20px; padding: 10px; background: #e9ecef; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <h1>Rede Social - Busca em Largura (BFS)</h1>
+
+    <div class="container">
+        <!-- Área visual do grafo -->
+        <div id="network-container"></div>
+
+        <!-- Painel de interações -->
+        <div class="sidebar">
+            <h3>Controles</h3>
+            <div class="form-group">
+                <label for="origem">Origem:</label>
+                <select id="origem"></select>
+            </div>
+            <div class="form-group">
+                <label for="destino">Destino:</label>
+                <select id="destino"></select>
+            </div>
+
+            <button onclick="calcularCaminho()">Calcular Caminho Mínimo</button>
+            <button onclick="parMaisDistante()" style="background: #28a745; margin-top: 10px;">Encontrar Par Mais Distante</button>
+
+            <div class="result-box">
+                <strong>Resultados:</strong>
+                <p id="saida">Selecione os usuários e clique em calcular.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let network = null;
+        let usuariosGlobais = [];
+        let amizadesGlobais = [];
+
+        // Puxa os dados da API em tempo real
+        async function carregarRede() {
+            const res = await fetch('http://localhost:3000/api/rede');
+            const data = await res.json();
+            usuariosGlobais = data.users;
+            amizadesGlobais = data.friendships;
+
+            popularSelects(usuariosGlobais);
+            desenharGrafo(usuariosGlobais, amizadesGlobais);
+        }
+
+        function popularSelects(users) {
+            const s1 = document.getElementById('origem');
+            const s2 = document.getElementById('destino');
+            users.forEach(u => {
+                s1.add(new Option(u.name, u.id));
+                s2.add(new Option(u.name, u.id));
+            });
+            s1.value = 'Dillan';
+            s2.value = 'Felipe Carvalho';
+        }
+
+        // Renderiza o grafo com nós fixos (sem efeito jelly/arrastar) e texto em preto
+        function desenharGrafo(users, friendships, caminhoDestaque = []) {
+            const nodes = new vis.DataSet(users.map(u => {
+                const destaque = caminhoDestaque.includes(u.id);
+                return {
+                    id: u.id,
+                    label: u.name,
+                    color: destaque ? '#e74c3c' : '#97c2fc',
+                    font: { color: '#000000', bold: destaque },
+                    shape: 'dot',
+                    size: 20,
+                    fixed: true // Trava a posição do nó, impedindo que seja arrastado
+                };
+            }));
+
+            const edges = new vis.DataSet(friendships.map((f, i) => {
+                let destaque = false;
+                for (let k = 0; k < caminhoDestaque.length - 1; k++) {
+                    if ((caminhoDestaque[k] === f[0] && caminhoDestaque[k+1] === f[1]) ||
+                        (caminhoDestaque[k] === f[1] && caminhoDestaque[k+1] === f[0])) {
+                        destaque = true;
+                    }
+                }
+                return { id: i, from: f[0], to: f[1], color: destaque ? '#e74c3c' : '#848484', width: destaque ? 4 : 1 };
+            }));
+
+            const container = document.getElementById('network-container');
+            const data = { nodes, edges };
+            
+            // Desativa completamente a física do grafo para ele ficar totalmente estático
+            const options = {
+                physics: false
+            };
+
+            if (network) {
+                network.setData(data);
+            } else {
+                network = new vis.Network(container, data, options);
+            }
+        }
+
+        // Envia requisição para calcular a BFS no back-end em tempo real
+        async function calcularCaminho() {
+            const origemId = document.getElementById('origem').value;
+            const destinoId = document.getElementById('destino').value;
+
+            const res = await fetch('http://localhost:3000/api/caminho', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ origemId, destinoId })
+            });
+            const data = await res.json();
+            const saida = document.getElementById('saida');
+
+            if (!data.existeCaminho) {
+                saida.innerHTML = 'Não há caminho entre os usuários.';
+                desenharGrafo(usuariosGlobais, amizadesGlobais, []);
+            } else {
+                saida.innerHTML = `Caminho: ${data.caminho.join(' -> ')}<br>Distância: ${data.distancia} conexão(ões)`;
+                desenharGrafo(usuariosGlobais, amizadesGlobais, data.caminho);
+            }
+        }
+
+        // Busca o par mais distante na API em tempo real
+        async function parMaisDistante() {
+            const res = await fetch('http://localhost:3000/api/par-mais-distante');
+            const data = await res.json();
+            if (data.par) {
+                document.getElementById('saida').innerHTML = `Mais distante: ${data.nomeOrigem} e ${data.nomeDestino} (${data.distancia} conexões)`;
+                document.getElementById('origem').value = data.par[0];
+                document.getElementById('destino').value = data.par[1];
+                calcularCaminho();
+            }
+        }
+
+        carregarRede();
+    </script>
+</body>
+</html>
